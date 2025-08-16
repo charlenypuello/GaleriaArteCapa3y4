@@ -1,27 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
-using GaleriadeArte.Application.Contracts;
-using GaleriadeArte.Application.DTOs;
+using GaleriaArteCapa.Application.Contracts;
+using GaleriaArteCapa.Application.DTOs;
 using GaleriaArteCapa.Infrastructure.Exceptions;
 
 namespace GaleriaArteCapa.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ArtworkController : ControllerBase
+    public class ObraController : ControllerBase
     {
-        private readonly IArtworkService _artworkService;
+        private readonly IObraService _obraService;
         
-        public ArtworkController(IArtworkService artworkService)
+        public ObraController(IObraService obraService)
         {
-            _artworkService = artworkService;
+            _obraService = obraService;
         }
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ArtworkReadDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ObraReadDto>>> GetAll()
         {
             try
             {
-                var result = await _artworkService.GetAllAsync();
+                var result = await _obraService.GetAllWithUserAndInteraccionesAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -31,19 +31,19 @@ namespace GaleriaArteCapa.Api.Controllers
         }
         
         [HttpGet("{id}")]
-        public async Task<ActionResult<ArtworkReadDto>> GetById(int id)
+        public async Task<ActionResult<ObraReadDto>> GetById(int id)
         {
             try
             {
-                var result = await _artworkService.GetByIdAsync(id);
+                var result = await _obraService.GetByIdAsync(id);
                 if (result == null)
-                    return NotFound($"Artwork con ID {id} no encontrado");
+                    return NotFound($"Obra con ID {id} no encontrado");
                     
                 return Ok(result);
             }
-            catch (ArtworkNotFoundException)
+            catch (ObraNotFoundException)
             {
-                return NotFound($"Artwork con ID {id} no encontrado");
+                return NotFound($"Obra con ID {id} no encontrado");
             }
             catch (Exception ex)
             {
@@ -52,17 +52,17 @@ namespace GaleriaArteCapa.Api.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult<ArtworkReadDto>> Create([FromBody] ArtworkCreateDto createDto)
+        public async Task<ActionResult<ObraReadDto>> Create([FromBody] ObraCreateDto createDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                     
-                var result = await _artworkService.CreateAsync(createDto);
+                var result = await _obraService.CreateAsync(createDto);
                 return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
             }
-            catch (ArtworkValidationException ex)
+            catch (ObraValidationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -73,26 +73,26 @@ namespace GaleriaArteCapa.Api.Controllers
         }
         
         [HttpPut("{id}")]
-        public async Task<ActionResult<ArtworkReadDto>> Update(int id, [FromBody] ArtworkUpdateDto updateDto)
+        public async Task<ActionResult<ObraReadDto>> Update(int id, [FromBody] ObraUpdateDto updateDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                     
-                var result = await _artworkService.UpdateAsync(id, updateDto);
+                var result = await _obraService.UpdateAsync(id, updateDto);
                 if (result == null)
-                    return NotFound($"Artwork con ID {id} no encontrado");
+                    return NotFound($"Obra con ID {id} no encontrado");
                     
                 return Ok(result);
             }
-            catch (ArtworkNotFoundException)
+            catch (ObraNotFoundException)
             {
-                return NotFound($"Artwork con ID {id} no encontrado");
+                return NotFound($"Obra con ID {id} no encontrado");
             }
-            catch (ArtworkValidationException ex)
+            catch (ObraValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.Message);  
             }
             catch (Exception ex)
             {
@@ -105,15 +105,15 @@ namespace GaleriaArteCapa.Api.Controllers
         {
             try
             {
-                var result = await _artworkService.DeleteAsync(id);
+                var result = await _obraService.DeleteAsync(id);
                 if (!result)
-                    return NotFound($"Artwork con ID {id} no encontrado");
+                    return NotFound($"Obra con ID {id} no encontrado");
                     
                 return NoContent();
             }
-            catch (ArtworkNotFoundException)
+            catch (ObraNotFoundException)
             {
-                return NotFound($"Artwork con ID {id} no encontrado");
+                return NotFound($"Obra con ID {id} no encontrado");
             }
             catch (Exception ex)
             {

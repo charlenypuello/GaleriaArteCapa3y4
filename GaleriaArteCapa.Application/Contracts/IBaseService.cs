@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GaleriadeArte.Application.Contracts
+namespace GaleriaArteCapa.Application.Contracts
 {
     public interface IBaseService<TReadDto, TCreateDto, TUpdateDto>
     {

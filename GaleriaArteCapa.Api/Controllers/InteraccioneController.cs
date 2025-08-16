@@ -1,27 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
-using GaleriadeArte.Application.Contracts;
-using GaleriadeArte.Application.DTOs;
+using GaleriaArteCapa.Application.Contracts;
+using GaleriaArteCapa.Application.DTOs;
 using GaleriaArteCapa.Infrastructure.Exceptions;
 
 namespace GaleriaArteCapa.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ObrasDeArteController : ControllerBase
+    public class InteraccioneController : ControllerBase
     {
-        private readonly IObrasDeArteService _obrasdearteService;
+        private readonly IInteraccioneService _interaccioneService;
         
-        public ObrasDeArteController(IObrasDeArteService obrasdearteService)
+        public InteraccioneController(IInteraccioneService interaccioneService)
         {
-            _obrasdearteService = obrasdearteService;
+            _interaccioneService = interaccioneService;
         }
         
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ObrasDeArteReadDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<InteraccioneReadDto>>> GetAll()
         {
             try
             {
-                var result = await _obrasdearteService.GetAllAsync();
+                var result = await _interaccioneService.GetAllAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -31,19 +31,19 @@ namespace GaleriaArteCapa.Api.Controllers
         }
         
         [HttpGet("{id}")]
-        public async Task<ActionResult<ObrasDeArteReadDto>> GetById(int id)
+        public async Task<ActionResult<InteraccioneReadDto>> GetById(int id)
         {
             try
             {
-                var result = await _obrasdearteService.GetByIdAsync(id);
+                var result = await _interaccioneService.GetByIdAsync(id);
                 if (result == null)
-                    return NotFound($"ObrasDeArte con ID {id} no encontrado");
+                    return NotFound($"Interaccione con ID {id} no encontrado");
                     
                 return Ok(result);
             }
-            catch (ObrasDeArteNotFoundException)
+            catch (InteraccioneNotFoundException)
             {
-                return NotFound($"ObrasDeArte con ID {id} no encontrado");
+                return NotFound($"Interaccione con ID {id} no encontrado");
             }
             catch (Exception ex)
             {
@@ -52,17 +52,19 @@ namespace GaleriaArteCapa.Api.Controllers
         }
         
         [HttpPost]
-        public async Task<ActionResult<ObrasDeArteReadDto>> Create([FromBody] ObrasDeArteCreateDto createDto)
+        public async Task<ActionResult<InteraccioneReadDto>> Create([FromBody] InteraccioneCreateDto createDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                     
-                var result = await _obrasdearteService.CreateAsync(createDto);
-                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+                var result = await _interaccioneService.CreateAsync(createDto);
+
+                var interacionWithUser = await _interaccioneService.GetWithUser(result.Id);
+                return CreatedAtAction(nameof(GetById), new { id = interacionWithUser.Id }, interacionWithUser);
             }
-            catch (ObrasDeArteValidationException ex)
+            catch (InteraccioneValidationException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -73,26 +75,26 @@ namespace GaleriaArteCapa.Api.Controllers
         }
         
         [HttpPut("{id}")]
-        public async Task<ActionResult<ObrasDeArteReadDto>> Update(int id, [FromBody] ObrasDeArteUpdateDto updateDto)
+        public async Task<ActionResult<InteraccioneReadDto>> Update(int id, [FromBody] InteraccioneUpdateDto updateDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
                     
-                var result = await _obrasdearteService.UpdateAsync(id, updateDto);
+                var result = await _interaccioneService.UpdateAsync(id, updateDto);
                 if (result == null)
-                    return NotFound($"ObrasDeArte con ID {id} no encontrado");
+                    return NotFound($"Interaccione con ID {id} no encontrado");
                     
                 return Ok(result);
             }
-            catch (ObrasDeArteNotFoundException)
+            catch (InteraccioneNotFoundException)
             {
-                return NotFound($"ObrasDeArte con ID {id} no encontrado");
+                return NotFound($"Interaccione con ID {id} no encontrado");
             }
-            catch (ObrasDeArteValidationException ex)
+            catch (InteraccioneValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ex.Message);  
             }
             catch (Exception ex)
             {
@@ -105,15 +107,15 @@ namespace GaleriaArteCapa.Api.Controllers
         {
             try
             {
-                var result = await _obrasdearteService.DeleteAsync(id);
+                var result = await _interaccioneService.DeleteAsync(id);
                 if (!result)
-                    return NotFound($"ObrasDeArte con ID {id} no encontrado");
+                    return NotFound($"Interaccione con ID {id} no encontrado");
                     
                 return NoContent();
             }
-            catch (ObrasDeArteNotFoundException)
+            catch (InteraccioneNotFoundException)
             {
-                return NotFound($"ObrasDeArte con ID {id} no encontrado");
+                return NotFound($"Interaccione con ID {id} no encontrado");
             }
             catch (Exception ex)
             {
